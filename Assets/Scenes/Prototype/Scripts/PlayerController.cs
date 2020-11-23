@@ -55,76 +55,46 @@ public class PlayerController : MonoBehaviour
     /// <returns></returns>
     bool CheckAbility()
     {
-        //確認成功或確認失敗flag
-        bool success = false;
-        bool fail = false;
-
-        //startX重置用的flag
-        bool first = true;
-
-        //大迴圈跑3x3次
-        //計數startCounterY,數3次
-        //起點startY，從角色位置的左上開始
-        for (int startCounterY = 0,startY = Mathf.Clamp(now.y - 2, 0, 4);
-            startCounterY < 3 && startY < 3;
-            startCounterY++, startY++)
+        bool flag = false;
+        int counter = 0;
+        int startY = Mathf.Clamp(now.y - 2, 0, 4);
+        int startX = Mathf.Clamp(now.x - 2, 0, 4);
+        while (counter < 9)
         {
-            //確認成功，跳出
-            if (success) break;
-            //起點startX，超過3就從0開始，counterX計數3次
-            for (int startCounterX = 0,startX = (first? Mathf.Clamp(now.x - 2, 0, 4):0);
-                startCounterX < 3 && startX < 3;
-                startCounterX++, startX++)
+            flag = false;
+            abilityClears = new List<Vector2Int>();
+            for (int y = 0; y < 3; y++)
             {
-                first = false;
-                //確認成功，跳出
-                if (success) break;
-
-                abilityClears = new List<Vector2Int>();
-
-                //小迴圈檢查方框內尋訪3x3次
-                //成功了就全部跳出
-                //失敗就跳出小圈
-                for (int y = startY, counterY = 0;
-                    counterY < 3 && y < 5;
-                    counterY++, y++)
+                if (flag) break;
+                for (int x = 0; x < 3; x++)
                 {
-                    //確認成功，跳出
-                    if (success) break;
-
-                    //確認失敗，跳出
-                    if (fail)
+                    if (ability[y, x])
                     {
-                        //下一大圈還有可能，flag復位
-                        fail = false;
-                        //跳出當前小圈
-                        break;
-                    }
-                    for (int x = startX, counterX = 0;
-                        counterX < 3 && x < 5;
-                        counterX++, x++)
-                    {
-                        if (ability[counterY, counterX])
+                        if (stageManager.stageStatus[startY + y, startX + x])
                         {
-                            if (stageManager.stageStatus[y, x])
-                            {
-
-                                abilityClears.Add(new Vector2Int(x, y));
-
-                            }
-                            else//技能不成立，跳出小圈
-                            {
-                                fail = true;
-                                break;
-                            }
+                            abilityClears.Add(new Vector2Int(startX + x, startY + y));
                         }
-                        if (counterX == 2 && counterY == 2)
+                        else
                         {
-                            return true;
+                            flag = true;
+                            break;
                         }
                     }
+                    if (x == y && x == 2) return true;
+
                 }
             }
+            startX++;
+            if (startX > 2)
+            {
+                startX = 0;
+                startY++;
+                if (startY > 2)
+                {
+                    startY = 0;
+                }
+            }
+            counter++;
         }
         return false;
     }
