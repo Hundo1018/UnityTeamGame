@@ -1,4 +1,6 @@
-﻿using System.Collections;
+﻿using System;
+using System.Linq;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -9,37 +11,37 @@ public class PlayerController : MonoBehaviour
     /// </summary>
     static bool O = true;
     static bool X = false;
-    bool[,] ability =
+    int[] ability =
     {
-        { O,X,O },
-        { X,O,X },
-        { O,X,O },
+        0b_1_0_1,
+        0b_0_1_0,
+        0b_1_0_1
     };
     /// <summary>
     /// 測試用5x5 T型 大技能
     /// </summary>
-    bool[,] ultimateAbility =
+    int[] ultimateAbility =
     {
-        { X, X, O, X, X},
-        { X, O, O, O, X},
-        { O, O, O, O, O},
-        { X, O, O, O, X},
-        { X, X, O, X, X},
+        0b_0_0_1_0_0,
+        0b_0_1_1_1_0,
+        0b_1_1_1_1_1,
+        0b_0_1_1_1_0,
+        0b_0_0_1_0_0        
     };
+
     /// <summary>
     /// 開完技能後要清除的位置
     /// </summary>
     List<Vector2Int> abilityClears;
+    int abilityClears_Num = 0;
 
     public StageManager stageManager;
     Vector2Int now = new Vector2Int(2, 2);
     /// <summary>
     /// 垂直輸入(上下,WS)
-    /// </summary>
-    int ver = 0;
-    /// <summary>
     /// 水平輸入(左右,AD)
     /// </summary>
+    int ver = 0;
     int hor = 0;
     bool space = false;
     bool pressJ = false;
@@ -48,8 +50,10 @@ public class PlayerController : MonoBehaviour
     /// </summary>
     void ClearStages()
     {
-        abilityClears.ForEach(v => stageManager.SetStatus(v, false));
-        abilityClears = new List<Vector2Int>();
+        //abilityClears.ForEach(v => stageManager.SetStatus(v, false));
+        //abilityClears = new List<Vector2Int>();
+        stageManager.ClearAllStatus(abilityClears_Num);
+        abilityClears_Num = 0;
     }
 
     /// <summary>
@@ -58,11 +62,42 @@ public class PlayerController : MonoBehaviour
     /// <returns></returns>
     bool CheckAbility()
     {
+        bool[] tmp_IsOk = new bool[9];
         bool flag = false;
-        int counter = 0;
+        //int counter = 0;
         int startY = Mathf.Clamp(now.y - 2, 0, 4);
         int startX = Mathf.Clamp(now.x - 2, 0, 4);
-        while (counter < 9)
+        int tmp_getSkill, tmp_getStatus;
+        tmp_getSkill = 0;
+        for (int y = 0; y < 3; y++)
+        {
+            tmp_getSkill = (tmp_getSkill << 5) + ability[y];
+        }
+        tmp_getSkill = (tmp_getSkill << 12);
+        tmp_getStatus = Convert.ToInt32(String.Join("", stageManager.GetAllStatus().Select(x=>x?1:0).ToArray()),2);
+
+        for(int y=0,i=0; y<3; y++){
+            for(int x=0; x<3; x++,i++){
+                tmp_IsOk[i] = (tmp_getSkill & tmp_getStatus) == tmp_getSkill;
+                tmp_getSkill = tmp_getSkill >> 1;
+            }
+            tmp_getSkill = tmp_getSkill >> 2;
+        }
+
+        abilityClears_Num = 0;
+        for(int i = startY*3+startX, counter=0; counter<9; i=(i+1)%9,counter++){
+            if(tmp_IsOk[i])
+            {
+                for (int y = 0; y < 3; y++)
+                {
+                    abilityClears_Num = (abilityClears_Num << 5) + ability[y];
+                }
+                abilityClears_Num = abilityClears_Num << 12;
+                abilityClears_Num = abilityClears_Num >> (i/3)*5 + i%3;
+                return true;
+            }
+        }
+        /*while (counter < 9)
         {
             flag = false;
             abilityClears = new List<Vector2Int>();
@@ -98,7 +133,7 @@ public class PlayerController : MonoBehaviour
                 }
             }
             counter++;
-        }
+        }//*/
         return false;
     }
     /// <summary>
@@ -107,28 +142,23 @@ public class PlayerController : MonoBehaviour
     /// <returns></returns>
     bool CheckUltimateAbility()
     {
-        //預計要消除的位置
-        abilityClears = new List<Vector2Int>();
+        int tmp_getSkill = 0, tmp_getStatus;
         for (int y = 0; y < 5; y++)
         {
-            for (int x = 0; x < 5; x++)
-            {
-                if (ultimateAbility[y, x])
-                {
-                    if (stageManager.stageStatus[y, x])
-                    {
-                        abilityClears.Add(new Vector2Int(x, y));
-                    }
-                    else//技能不成立
-                    {
-                        //清空
-                        abilityClears = new List<Vector2Int>();
-                        return false;
-                    }
-                }
-            }
+            tmp_getSkill = (tmp_getSkill << 5) + ultimateAbility[y];
         }
-        return true;
+        tmp_getStatus = Convert.ToInt32(String.Join("", stageManager.GetAllStatus().Select(x=>x?1:0).ToArray()),2);
+
+        if((tmp_getSkill & tmp_getStatus) == tmp_getSkill)//True為觸發成功
+        {
+            abilityClears_Num = tmp_getSkill;
+            return true;
+        }
+        else
+        {
+            abilityClears_Num = 0;
+            return false;
+        }
     }
 
     /// <summary>
@@ -145,7 +175,7 @@ public class PlayerController : MonoBehaviour
     /// </summary>
     void action()
     {
-        if (space)
+        if (Input.GetKey(KeyCode.Space))//技能判斷
         {
             if (CheckUltimateAbility())
             {
@@ -162,41 +192,25 @@ public class PlayerController : MonoBehaviour
             {
                 Debug.Log("Fail!");
             }
-        }else if(pressJ){
+        }else if(Input.GetKeyDown(KeyCode.J)){//格子觸發判斷
             stageManager.SetStatus(now, true);
         }
-        else
+        else//移動判斷
         {
+            if(Input.GetKeyDown(KeyCode.W)) now.y -= 1;
+            if(Input.GetKeyDown(KeyCode.S)) now.y += 1;
+            
+            if(Input.GetKeyDown(KeyCode.A)) now.x -= 1;
+            if(Input.GetKeyDown(KeyCode.D)) now.x += 1;
             //把數值限制在0~4
-            now.x = Mathf.Clamp(now.x + hor, 0, 4);
-            now.y = Mathf.Clamp(now.y + ver, 0, 4);
+            now.x = Mathf.Clamp(now.x , 0, 4);
+            now.y = Mathf.Clamp(now.y , 0, 4);
             updateStatus();
         }
     }
     /// <summary>
-    /// 取得輸入
+    /// 判斷按鍵按下
     /// </summary>
-    void getInput()
-    {
-        space = Input.GetKey(KeyCode.Space);
-        pressJ = Input.GetKey(KeyCode.J);
-        if (!space)//沒用招才可移動
-        {
-            ver = 0;
-            if(Input.GetKeyDown(KeyCode.W)) ver -= 1;
-            if(Input.GetKeyDown(KeyCode.S)) ver += 1;
-            hor = 0;
-            if(Input.GetKeyDown(KeyCode.A)) hor -= 1;
-            if(Input.GetKeyDown(KeyCode.D)) hor += 1;
-        }
-    }
-    /// <summary>
-    /// 輸出較晚按下的鍵的數值(-1~1)
-    /// </summary>
-    /// <param name="current">當前數值</param>
-    /// <param name="a">鍵a</param>
-    /// <param name="b">鍵b</param>
-    /// <returns></returns>
     bool CheckInput()
     {
         if (Input.GetKeyDown(KeyCode.W) ||
@@ -211,7 +225,7 @@ public class PlayerController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-
+        updateStatus();
     }
 
     // Update is called once per frame
@@ -219,7 +233,6 @@ public class PlayerController : MonoBehaviour
     {
         if (CheckInput())
         {
-            getInput();
             action();
         }
     }

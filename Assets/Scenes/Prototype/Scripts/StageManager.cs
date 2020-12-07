@@ -11,16 +11,16 @@ public class StageManager : MonoBehaviour
     //存stage
     public GameObject[,] stages = new GameObject[5, 5];
     //存狀態
-    public bool[,] stageStatus = new bool[5, 5];
+    private bool[] stageStatus = new bool[25];
     //存位置
     public Vector2[,] stagesV = new Vector2[5, 5];
     
     [SerializeField]
-    float scale = 1.5f;
+    private float scale = 1.5f;
     [SerializeField]
-    float xOffset = 1;
+    private float xOffset = 1;
     [SerializeField]
-    float yOffset = -4.5f;
+    private float yOffset = -4.5f;
     /// <summary>
     /// 設定Stage的狀態
     /// </summary>
@@ -28,13 +28,29 @@ public class StageManager : MonoBehaviour
     /// <param name="s"></param>
     public void SetStatus(Vector2Int v, bool s)
     {
-        stageStatus[v.y, v.x] = s;
+        stageStatus[v.y*5 + v.x] = s;
         //觸發紅色示意一下
         stages[v.y, v.x].GetComponent<SpriteRenderer>().color = (s ? Color.red : Color.white);
     }
 
+    public void SetStatus(int x, int y, bool s)
+    {
+        stageStatus[y*5 + x] = s;
+        //觸發紅色示意一下
+        stages[y, x].GetComponent<SpriteRenderer>().color = (s ? Color.red : Color.white);
+    }
+
+    public bool Status(int x, int y){
+        return stageStatus[y*5 + x];
+    }
+
+    public bool[] GetAllStatus(){
+        return stageStatus;
+    }
+
     void generate()
     {
+        int i;
         for (int y = 0; y < 5; y++)
         {
             for (int x = 0; x < 5; x++)
@@ -43,16 +59,29 @@ public class StageManager : MonoBehaviour
                 float vX = xOffset + x * scale;
                 float vY = yOffset + (5 - y) * scale;
                 //建立一個新的stage
+                i = y*5 + x;
                 stages[y, x] = GameObject.Instantiate(stagePrefab, parentManager.transform);
                 stages[y, x].transform.localPosition = new Vector2(vX, vY);
                 stages[y, x].name = $"stage{y},{x}";
 
                 stagesV[y, x] = stages[y, x].transform.position;
-                stageStatus[y, x] = false;
+                stageStatus[y*5 + x] = false;
             }
         }
-        //中間因為主角先站，所以先觸發
-        stageStatus[2, 2] = true;
+    }
+
+    public void ClearAllStatus(int n){//以1表示要清除 傳入25bits數字
+        int tmp = n;
+        for (int y = 4; y >= 0; y--)
+        {
+            for (int x = 4; x >= 0; x--)
+            {
+                if(tmp%2 == 1){
+                    SetStatus(x, y, false);
+                }
+                tmp = tmp >> 1;
+            }
+        }
     }
     
     // Start is called before the first frame update
