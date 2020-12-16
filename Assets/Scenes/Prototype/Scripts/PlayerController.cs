@@ -147,7 +147,7 @@ public class PlayerController : MonoBehaviour
         {
             tmp_getSkill = (tmp_getSkill << 5) + ultimateAbility[y];
         }
-        tmp_getStatus = Convert.ToInt32(String.Join("", stageManager.GetAllStatus().Select(x=>x?1:0).ToArray()),2);
+        tmp_getStatus = Convert.ToInt32(String.Join("", stageManager.GetAllStatus().Select(x=>x?1:0 ).ToArray()),2);
 
         if((tmp_getSkill & tmp_getStatus) == tmp_getSkill)//True為觸發成功
         {
