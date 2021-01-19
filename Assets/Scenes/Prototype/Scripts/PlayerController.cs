@@ -147,9 +147,15 @@ public class PlayerController : MonoBehaviour
         {
             tmp_getSkill = (tmp_getSkill << 5) + ultimateAbility[y];
         }
+        //用於取得技能需觸發範圍
+        
         tmp_getStatus = Convert.ToInt32(String.Join("", stageManager.GetAllStatus().Select(x=>x?1:0).ToArray()),2);
+        //用於取得場上格子狀態
+        //a.Select(x=>x?1:0).ToArray 將a的元素True轉為1，False轉為0
+        //String,Join(a,b) 以aㄗㄨㄛ
+        //Convert.ToInt32(a,2) ur;
 
-        if((tmp_getSkill & tmp_getStatus) == tmp_getSkill)//True為觸發成功
+        if((tmp_getSkill & tmp_getStatus) == tmp_getSkill)//判斷格子狀態是否覆蓋技能需觸發範圍True為技能觸發成功
         {
             abilityClears_Num = tmp_getSkill;
             return true;
