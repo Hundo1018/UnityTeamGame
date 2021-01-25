@@ -24,13 +24,44 @@ namespace SkillConstructer
 
         //攻擊時要做的動作
         public Action<int, int> DoAttackForEachCube = (x, y) => { };
-        public Action DoAttackOnce = () => { };
+        public Action DoBeforeAttack = () => { };
+        public Action DoAfterAttack = () => { };
 
         //初始化變數用
         private void Init(int w, int h, int shape, int type, int data)
         {
             _w = w; _h = h;
             _shape = shape;
+            _type = type;
+            _data = data;
+            CreateNextRange();
+        }
+
+        //初始化變數用
+        private void Init(string shape, int type, int data)
+        {
+            string[] str = shape.Split(';');
+            int h = str.Length, w = 0, tmp_shape = 0;
+            if (h > 5) h = 5;
+
+            for (int i = 0; i < h; i++)
+            {
+                if (w < str[i].Length)
+                {
+                    w = str[i].Length;
+                    if (w > 5) w = 5;
+                }
+                str[i] += "00000";
+                for (int j = 0; j < 5; j++)
+                {
+                    tmp_shape <<= 1;
+                    if (str[i][j] != '0') tmp_shape += 1;
+                }
+            }
+            tmp_shape <<= (5 - h) * 5;
+
+            _w = w; _h = h;
+            _shape = tmp_shape;
             _type = type;
             _data = data;
             CreateNextRange();
@@ -60,8 +91,7 @@ namespace SkillConstructer
                         //確認是否達到上限
                         if (cou == max) break;
                     }
-                    //填滿25格
-                    _nextRange <<= 24 - i;
+                    _nextRange <<= 25 - i;
                     //過濾範圍外位置
                     _nextRange &= _shape;
                 }
@@ -118,7 +148,7 @@ namespace SkillConstructer
             {
                 int[] temp = new int[25];
                 _nextRange = _shape;
-                int dy = 7 - (_data / 5), dx = 7 - (_data % 5);
+                int dy = (_data / 5)+3, dx = (_data % 5)+3;
                 for (int i = 4; i >= 0; i--)
                 {
                     for (int j = 4; j >= 0; j--)
@@ -142,55 +172,62 @@ namespace SkillConstructer
         {
             Init(0, 0, 0, -1, 0);
         }
-        
-        //建構玩家技能
+
+        //建構玩家技能 或 固定式敵人攻擊
         //shape是以每一Row以;分隔
-        public Skill(string shape)
+        //isPlayer True為玩家技能 False為固定式技能
+        public Skill(string shape, bool isPlayer)
         {
-            string[] str = shape.Split(';');
-            int h = str.Length, w = 0, tmp_shape = 0;
-            if (h > 5) h = 5;
-            
-            for (int i = 0; i < h; i++)
-            {
-                if (w < str[i].Length)
-                {
-                    w = str[i].Length;
-                    if (w > 5) w = 5;
-                }
-                str[i] += "00000";
-                for (int j = 0; j < 5; j++)
-                {
-                    tmp_shape <<= 1;
-                    if (str[i][j] != '0') tmp_shape += 1;
-                }
-            }
-            tmp_shape <<= (5 - h) * 5;
-            Init(w, h, tmp_shape, 0, 0);
+            if (isPlayer)
+                Init(shape, 0, 0);
+            else Init(shape, 1, 0);
         }
 
-        //建構固定式敵人攻擊
+        //建構隨機式敵人攻擊
+        //range是以每一Row以;分隔
+        //type 0是小於等於numberOfCube 1是等於numberOfCube
+        //numberOfCube是召喚的上限
+        public Skill(string range, int type, int numberOfCube)
+        {
+            Init(range, 2, (numberOfCube << 1) + type);
+        }
+
+        //建構追蹤式敵人攻擊
+        //range是以每一Row以;分隔
+        //position是玩家的位置
+        public Skill(string range, Vector2Int position)
+        {
+            Init(range, 3, position.y * 5 + position.x);
+        }
+
+        /*//建構固定式敵人攻擊
         //range是以25bits來表示的攻擊範圍
         public Skill(int range)
         {
             Init(0, 0, range, 1, 0);
         }
-
+  
         //建構隨機式敵人攻擊
         //range是以25bits來表示的攻擊範圍
         //type 0是小於等於numberOfCube 1是等於numberOfCube
         //numberOfCube是召喚的上限
         public Skill(int range, int type, int numberOfCube)
         {
-            Init(0, 0, range, 2, (numberOfCube << 2) + type);
+            Init(0, 0, range, 2, (numberOfCube << 1) + type);
         }
-
+  
         //建構追蹤式敵人攻擊
         //range是以25bits來表示的相對攻擊範圍
         //position是玩家的位置
         public Skill(int range, Vector2Int position)
         {
             Init(0, 0, range, 3, position.y * 5 + position.x);
+        }//*/
+
+        //複製Skill
+        public Skill(Skill skill)
+        {
+            Init(skill._w, skill._h, skill._shape, skill._type, skill._data);
         }
 
         //更改隨機式攻擊的數據
@@ -250,6 +287,7 @@ namespace SkillConstructer
         {
             int attackRange = getAttackRangeWithChange();
             int i = 24;
+            DoBeforeAttack();
             while (attackRange != 0)
             {
                 //攻擊範圍內再動作
@@ -260,7 +298,7 @@ namespace SkillConstructer
                 attackRange >>= 1;
                 i -= 1;
             }
-            DoAttackOnce();
+            DoAfterAttack();
         }
 
         //玩家用攻擊
@@ -302,6 +340,7 @@ namespace SkillConstructer
                 int shape = _shape;
                 shape >>= (pos / w) * 5 + (pos % w);
                 int i = 24;
+                DoBeforeAttack();
                 while (shape != 0)
                 {
                     if (shape % 2 == 1)
@@ -311,7 +350,107 @@ namespace SkillConstructer
                     shape >>= 1;
                     i -= 1;
                 }
-                DoAttackOnce();
+                DoAfterAttack();
+                return true;
+            }
+            return false;
+        }
+    }
+
+    public class Effect
+    {
+        
+        private int _type;  //攻擊類型
+        private int _times, _base;//倍率 基底
+        // NewValue = OldValue * _times + _base
+
+        private int _interval, _totalTime, _remaining;
+        //間格時間 持續時間 剩餘時間
+
+        public Func<bool> _condition;
+        //觸發條件
+
+        //初始化變數用
+        private void Init(int type, int times, int baseValue, int interval, int totalTime, Func<bool> condiiton)
+        {
+            _type = type;
+            _times = times;
+            _base = baseValue;
+            _interval = interval;
+            _totalTime = totalTime;
+            _remaining = -1;
+            _condition = condiiton;
+        }
+
+        //空效果
+        public Effect()
+        {
+            Init(0, 1, 0, 1, 0, () =>
+            {
+                return ((_totalTime - _remaining) % _interval) == 0;
+            });
+        }
+
+        //單次觸發型(ex:受傷)
+        //times是數值乘以地倍率
+        //baseValue是再加上的基底
+        private Effect(int times, int baseValue)
+        {
+            Init(1, times, baseValue, 1, 1, () =>
+            {
+                return ((_totalTime - _remaining) % _interval) == 0;
+            });
+        }
+
+        //持續發作型(ex:減速)
+        //times是數值乘以地倍率
+        //baseValue是再加上的基底
+        //totalTime是效果的持續時間
+        private Effect(int times, int baseValue, int totalTime)
+        {
+            Init(1, times, baseValue, 1, totalTime, () =>
+            {
+                return ((_totalTime - _remaining) % _interval) == 0;
+            });
+        }
+
+        //多次觸發型(ex:中毒)
+        //times是數值乘以地倍率
+        //baseValue是再加上的基底
+        //totalTime是效果的持續時間
+        //interval是效果觸發的間格時間
+        private Effect(int times, int baseValue, int totalTime, int interval)
+        {
+            Init(1, times, baseValue, interval, totalTime, () =>
+            {
+                return ((_totalTime - _remaining) % _interval) == 0;
+            });
+        }
+
+        //特殊觸發型(ex:反傷)
+        //times是數值乘以地倍率
+        //baseValue是再加上的基底
+        //totalTime是效果的持續時間
+        //conditoin是觸發的條件
+        private Effect(int times, int baseValue, int totalTime, Func<bool> condition)
+        {
+            Init(1, times, baseValue, 1, totalTime, condition);
+        }
+
+        //開始倒數
+        public void Reset()
+        {
+            _remaining = _totalTime;
+        }
+
+        //執行
+        public bool Do(ref int value)
+        {
+            if (_remaining>0)
+            {
+                if (_condition())
+                    value = value * _times + _base;
+                _remaining--;
                 return true;
             }
             return false;
