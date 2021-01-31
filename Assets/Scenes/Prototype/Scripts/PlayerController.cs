@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using SkillConstructer;
-using EntitiesCollection;
 
 namespace Entity
 {
@@ -20,7 +19,7 @@ namespace Entity
         /// </summary>
         int ver = 0;
         int hor = 0;
-        #region ForTestSkill
+        /*#region ForTestSkill
         Skill fixedSkill_u;
         Skill randomSkill_i;
         Skill randomSkill_o;
@@ -33,7 +32,7 @@ namespace Entity
                 return UnityEngine.Random.value;
             }
         }
-        #endregion
+        #endregion//*/
         
         public Vector2Int getPosition()
         {
@@ -76,7 +75,7 @@ namespace Entity
             {//格子觸發判斷
                 stageManager.SetStatus(now, true);
             }
-            #region ForTestSkill
+            /*#region ForTestSkill
             else if (Input.GetKeyDown(KeyCode.U))
             {
                 stageManager.ClearAllStatus((int)Math.Pow(2, 26) - 1);
@@ -97,7 +96,7 @@ namespace Entity
                 stageManager.ClearAllStatus((int)Math.Pow(2, 26) - 1);
                 trackingSkill_p.Attack();
             }
-            #endregion
+            #endregion//*/
             else//移動判斷
             {
                 if (Input.GetKeyDown(KeyCode.W)) now.y -= 1;
@@ -129,7 +128,7 @@ namespace Entity
         // Start is called before the first frame update
         void Start()
         {
-            updateStatus();
+            /*updateStatus();
             Ability.DoAttackForEachCube = (x, y) =>
             {
                 stageManager.SetStatus(x, y, false);
@@ -138,10 +137,10 @@ namespace Entity
             {
                 stageManager.SetStatus(x, y, false);
             };
-            #region ForTestSkill
+            /*#region ForTestSkill
             fixedSkill_u = new Skill("00011;01110;01110;01110;11", false);
-            randomSkill_i = new Skill("11111;11111;11111;11111;11111", 0, 5);
-            randomSkill_o = new Skill("11111;11111;11111;11111;11111", 1, 3);
+            randomSkill_i = new Skill(";01110;01110;01110;", 0, 5);
+            randomSkill_o = new Skill("10101;;10101;;10101", 1, 3);
             trackingSkill_p = new Skill("01010;;01010;;01010", new Vector2Int((int)(rand * 5), (int)(rand * 5)));
             fixedSkill_u.DoAttackForEachCube = (x, y) =>
             {
@@ -163,16 +162,16 @@ namespace Entity
             {
                 trackingSkill_p.ChangeData(now);
             };
-            #endregion
+            #endregion//*/
         }
 
         // Update is called once per frame
         void Update()
         {
-            if (CheckInput())
+            /*if (CheckInput())
             {
                 action();
-            }
+            }//*/
         }
     }
 

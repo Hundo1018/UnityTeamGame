@@ -3,10 +3,26 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using SkillConstructer;
-using EntitiesCollection;
 
 public class StageManager : MonoBehaviour
 {
+
+    // Start is called before the first frame update
+    void Start()
+    {
+        generate();
+        InitEntity();
+        InitPalyer();
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+        PlayerAction();
+        EntityAction();
+        SummonEntity();
+    }
+
     #region Stage
 
     //要複製的prefab
@@ -69,6 +85,7 @@ public class StageManager : MonoBehaviour
                 //建立一個新的stage
                 i = y * 5 + x;
                 stages[y, x] = GameObject.Instantiate(stagePrefab, parentManager.transform);
+                //stages[y, x] = GameObject.Instantiate(Entities.thorn, parentManager.transform);
                 stages[y, x].transform.localPosition = new Vector2(vX, vY);
                 stages[y, x].name = $"stage{y},{x}";
 
@@ -94,24 +111,95 @@ public class StageManager : MonoBehaviour
         }
     }
 
-    // Start is called before the first frame update
-    void Start()
-    {
-        generate();
-        //InitEntityController();
-    }
+    #endregion
 
-    // Update is called once per frame
-    void Update()
+    #region PlayerController
+
+    public GameObject player;
+    Skill Ability = new Skill("101;010;101", true);
+    Skill UltimateAbility = new Skill("00100;01110;11111;01110;00100", true);
+    
+    Vector2Int now = new Vector2Int(2, 2);
+    /// <summary>
+    /// 垂直輸入(上下,WS)
+    /// 水平輸入(左右,AD)
+    /// </summary>
+    int ver = 0;
+    int hor = 0;
+
+    void PlayerAction()
     {
-        //SummonEntity();
+        if (Input.GetKey(KeyCode.Space))//技能判斷
+        {
+            if (UltimateAbility.Attack(now, GetAllStatus()))
+            {
+                Debug.Log("Ultimate!");
+            }
+            else if (Ability.Attack(now, GetAllStatus()))
+            {
+                Debug.Log("Ability!");
+            }
+            else
+            {
+                Debug.Log("Fail!");
+            }
+        }
+        else if (Input.GetKeyDown(KeyCode.J))
+        {//格子觸發判斷
+            SetStatus(now, true);
+        }
+        else if (Input.GetKeyDown(KeyCode.K))
+        {//格子觸發判斷
+            SetStatus(now, true);
+        }
+        else//移動判斷
+        {
+            if (Input.GetKeyDown(KeyCode.W)) now.y -= 1;
+            if (Input.GetKeyDown(KeyCode.S)) now.y += 1;
+
+            if (Input.GetKeyDown(KeyCode.A)) now.x -= 1;
+            if (Input.GetKeyDown(KeyCode.D)) now.x += 1;
+            //把數值限制在0~4
+            now.x = Mathf.Clamp(now.x, 0, 4);
+            now.y = Mathf.Clamp(now.y, 0, 4);
+
+            player.transform.position = stagesV[now.y, now.x];
+        }
+    }
+    
+    void InitPalyer()
+    {
+        player.transform.position = stagesV[2, 2];
+        Ability.DoAttackForEachCube = (x, y) =>
+        {
+            SetStatus(x, y, false);
+        };
+        UltimateAbility.DoAttackForEachCube = (x, y) =>
+        {
+            SetStatus(x, y, false);
+        };
+    }
+    
+    void PlayerDo()
+    {
+        if (Input.anyKeyDown)
+        {
+
+        }
     }
 
     #endregion
 
     #region EntityController
-    /*
-    private List<Entityes> entities = new List<Entityes>();
+
+    #region Entities
+
+    public GameObject thorn;
+    public GameObject[] EntitiesCollection;
+
+    #endregion 
+
+    private List<Entities> entities = new List<Entities>();
     Skill fixedSkill_u, randomSkill_i, randomSkill_o, trackingSkill_p;
 
     //隨機生成亂數用
@@ -123,64 +211,128 @@ public class StageManager : MonoBehaviour
         }
     }
 
-    void InitEntityController()
+    void InitEntity()
     {
-        fixedSkill_u = new Skill(";01110;01110;01110;", false);
-        randomSkill_i = new Skill("11111;11111;11111;11111;11111", 0, 5);
-        randomSkill_o = new Skill("11111;11111;11111;11111;11111", 1, 3);
-        trackingSkill_p = new Skill("01010;;01010;;01010", new Vector2Int((int)(rand * 5), (int)(rand * 5)));
-        fixedSkill_u.DoAttackForEachCube = SetThorn;
-    }
-
-    void SetThorn(int x, int y)
-    {
-        Entityes temp = new Entityes(Entities.thorn,x*1.5,(5-y)*1.5,1);
-        temp._action = () =>
-        {
-            temp.reduceHp(1);
+        fixedSkill_u = new Skill("11111;01110;;01110;11111", false);
+        randomSkill_i = new Skill("10101;01010;10101;01010;10101", 0, 5);
+        randomSkill_o = new Skill("011;0011;11111;011;0011", 1, 3);
+        trackingSkill_p = new Skill("01010;;01010;;01010", new Vector2Int(2, 2));
+        fixedSkill_u.DoAttackForEachCube = (x, y) => {
+            Entities temp = new Entities(thorn, 1 + x * 1.5, -4.5 + (5 - y) * 1.5, 1);
+            temp._action = (self) =>
+            {
+                if (self.reduceHp(1))
+                {
+                    entities.Remove(self);
+                    Destroy(self._object);
+                }
+            };
+            temp._object.transform.parent = parentManager.transform;
+            entities.Add(temp);
         };
-        entities.Add(temp);
-    }
+        randomSkill_i.DoAttackForEachCube = (x, y) => {
+            Entities temp = new Entities(thorn, 1 + x * 1.5, -4.5 + (5 - y) * 1.5, 1);
+            temp._action = (self) =>
+            {
+                if (self.reduceHp(1))
+                {
+                    entities.Remove(self);
+                    Destroy(self._object);
+                }
+            };
+            temp._object.transform.parent = parentManager.transform;
+            entities.Add(temp);
+        };
+        randomSkill_o.DoAttackForEachCube = (x, y) => {
+            Entities temp = new Entities(thorn, 1 + x * 1.5, -4.5 + (5 - y) * 1.5, 1);
+            temp._action = (self) =>
+            {
+                if (self.reduceHp(1))
+                {
+                    entities.Remove(self);
+                    Destroy(self._object);
+                }
+            };
+            temp._object.transform.parent = parentManager.transform;
+            entities.Add(temp);
+        };
+        trackingSkill_p.DoAttackForEachCube = (x, y) => {
+            Entities temp = new Entities(thorn, 1 + x * 1.5, -4.5 + (5 - y) * 1.5, 1);
+            temp._action = (self) =>
+            {
+                if (self.reduceHp(1))
+                {
+                    entities.Remove(self);
+                    Destroy(self._object);
+                }
 
+            };
+            temp._object.transform.parent = parentManager.transform;
+            entities.Add(temp);
+        };
+        trackingSkill_p.DoAfterAttack = () =>
+        {
+            trackingSkill_p.ChangeData(now);
+        };
+    }
+    
     void SummonEntity()
     {
-        if(Input.GetKey(KeyCode.U))
+        if(Input.GetKeyDown(KeyCode.U))
         {
+            Debug.Log("Press U");
             fixedSkill_u.Attack();
         }
-        else if (Input.GetKey(KeyCode.I))
+        else if (Input.GetKeyDown(KeyCode.I))
         {
+            Debug.Log("Press I");
             randomSkill_i.Attack();
         }
-        else if (Input.GetKey(KeyCode.O))
+        else if (Input.GetKeyDown(KeyCode.O))
         {
+            Debug.Log("Press O");
             randomSkill_o.Attack();
         }
-        else if (Input.GetKey(KeyCode.P))
+        else if (Input.GetKeyDown(KeyCode.P))
         {
+            Debug.Log("Press P");
             trackingSkill_p.Attack();
+        }
+    }
+
+    void EntityAction()
+    {
+        int len = entities.Count;
+        for (int i = 0; i < len; i++)
+        {
+            entities[i].Attack(now.x, now.y);
+            if (len>entities.Count)
+            {
+                len--;
+                i--;
+            }
         }
     }
     //*/
     #endregion
-    
+
 }
 
-/*
-public class Entityes
+
+public class Entities
 {
     private double _X, _Y, _HP;
     Skill[] _skills;
-    public Action _action = () => { };
+    public Action<Entities> _action = (self) => { };
     public GameObject _object;
 
-    private void Init(GameObject gameObject, double x, double y, double hp, Action action, params Skill[] skills)
+    private void Init(GameObject gameObject, double x, double y, double hp, Action<Entities> action, params Skill[] skills)
     {   
         _object = GameObject.Instantiate(gameObject);
         _object.transform.localPosition = new Vector2(1, -4.5f);
         _object.transform.position = new Vector2((float)x, (float)y);
-        _X = x;
-        _Y = y;
+        _X = (int)(x / 1.5);
+        _Y = (int)(2 - y / 1.5);
         _action = action;
         _skills = new Skill[skills.Length];
         for (int i = 0; i < skills.Length; i++)
@@ -189,22 +341,22 @@ public class Entityes
         }
     }
     
-    public Entityes(GameObject gameObject, double x, double y, double hp)
+    public Entities(GameObject gameObject, double x, double y, double hp)
     {
-        Init(gameObject, x, y, hp, () => { }, new Skill[0]);
+        Init(gameObject, x, y, hp, (self) => { }, new Skill[0]);
     }
 
-    public Entityes(GameObject gameObject, double x, double y, double hp, Action action)
+    public Entities(GameObject gameObject, double x, double y, double hp, Action<Entities> action)
     {
         Init(gameObject, x, y, hp, action, new Skill[0]);
     }
 
-    public Entityes(GameObject gameObject, double x, double y, double hp, Action action, params Skill[] skills)
+    public Entities(GameObject gameObject, double x, double y, double hp, Action<Entities> action, params Skill[] skills)
     {
         Init(gameObject, x, y, hp, action, skills);
     }
 
-    public Entityes(Entityes entityes)
+    public Entities(Entities entityes)
     {
         Init(entityes._object, entityes._X, entityes._Y, entityes._HP, entityes._action, entityes._skills);
     }
@@ -225,7 +377,7 @@ public class Entityes
     {
         if (playerX == _X && playerY == _Y)
         {
-            _action();
+            _action(this);
         }
     }
 
