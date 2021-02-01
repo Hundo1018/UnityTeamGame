@@ -330,7 +330,7 @@ public class Entities
     {   
         _object = GameObject.Instantiate(gameObject);
         _object.transform.localPosition = new Vector2(1, -4.5f);
-        _object.transform.position = new Vector2((float)x, (float)y);
+        _object.transform.position = new Vector3((float)x, (float)y, -1);
         _X = (int)(x / 1.5);
         _Y = (int)(2 - y / 1.5);
         _action = action;
@@ -370,6 +370,7 @@ public class Entities
 
     public void Attack(int index)
     {
+        if (index < 0 || index >= _skills.Length) return;
         _skills[index].Attack();
     }
 
