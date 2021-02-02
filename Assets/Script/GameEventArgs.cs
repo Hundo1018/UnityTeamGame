@@ -10,5 +10,6 @@ public class GameEventArgs : System.EventArgs
     public GameEventArgs(float time = 1)
     {
         timeScale = time;
+
     }
 }
