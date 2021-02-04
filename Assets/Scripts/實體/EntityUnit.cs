@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class EntityUnit
+public class EntityUnit : Entity.EntityComponent
 {
 
+
 }
+

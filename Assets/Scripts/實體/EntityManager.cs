@@ -34,7 +34,7 @@ public class EntityManager : MonoBehaviour
     {
         FlyingFish flyingFish = new FlyingFish("飛魚一", 10);
         flyingFish.Add(new flyAbility());
-        flyingFish.GetComponent<flyAbility>();
+        flyingFish.GetComponent<flyAbility>().fly();
     }
 
     // Update is called once per frame

@@ -10,11 +10,12 @@ namespace Entity
     /// <summary>
     /// 實體元件
     /// </summary>
+
     public abstract class EntityComponent
     {
         protected List<EntityComponent> components;
 
-        public EntityComponent()
+        protected EntityComponent()
         {
             components = new List<EntityComponent>();
         }
@@ -26,12 +27,11 @@ namespace Entity
                 components.Add(item);
             }
         }
-        public void Add<T>() where T : EntityComponent,new()
+        public void Add<T>() where T : EntityComponent, new()
         {
             T temp = new T();
             components.Add(temp);
         }
-
         /// <summary>
         /// 刪除一個符合型別的實體元件
         /// </summary>
@@ -56,9 +56,9 @@ namespace Entity
         /// </summary>
         /// <typeparam name="T">T必須是一種實體元件型別</typeparam>
         /// <returns></returns>
-        public EntityComponent GetComponent<T>() where T : EntityComponent
+        public T GetComponent<T>() where T : EntityComponent
         {
-            return components.Find(x => x is T);
+            return components.Find(x => x is T) as T;
         }
 
         /// <summary>
@@ -66,9 +66,11 @@ namespace Entity
         /// </summary>
         /// <typeparam name="T">T必須是一種實體元件型別</typeparam>
         /// <returns></returns>
-        public EntityComponent[] GetComponents<T>() where T : EntityComponent
+        public T[] GetComponents<T>() where T : EntityComponent
         {
-            return components.FindAll(x => x is T).ToArray();
+            return components.FindAll(x => x is T).ToArray() as T[];
         }
+
     }
+
 }

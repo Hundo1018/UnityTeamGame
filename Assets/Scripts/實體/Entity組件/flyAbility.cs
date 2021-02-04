@@ -6,7 +6,7 @@ namespace Entity
     /// 實體元件
     /// </summary>
     public class flyAbility : EntityComponent {
-        public int enableFly {get; set;} = 1;
+        public int enableFly {get; set;} = 0;
         public void fly(){
             if(enableFly == 1)
                 Debug.Log("我在天上飛~");
