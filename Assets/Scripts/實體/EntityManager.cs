@@ -24,7 +24,7 @@ public class EntityManager : MonoBehaviour
         Timer.TimerBehaviour.GameTimeUpdated += OnGameUpdate;
     }
 
-    void OnGameUpdate(object sender, Timer.TimerEventArgs e)
+    private  void OnGameUpdate(object sender, Timer.TimerEventArgs e)
     {
 
     }
