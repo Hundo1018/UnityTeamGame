@@ -10,17 +10,10 @@ namespace Entity
     /// <summary>
     /// 實體元件
     /// </summary>
-    
+
     public abstract class EntityComponent
     {
-        protected string tag;
         protected List<EntityComponent> components;
-
-        protected EntityComponent(string tag)
-        {
-            this.tag = tag;
-            components = new List<EntityComponent>();
-        }
 
         protected EntityComponent()
         {
@@ -63,9 +56,9 @@ namespace Entity
         /// </summary>
         /// <typeparam name="T">T必須是一種實體元件型別</typeparam>
         /// <returns></returns>
-        public EntityComponent GetComponent<T>() where T : EntityComponent
+        public T GetComponent<T>() where T : EntityComponent
         {
-            return components.Find(x => x is T);
+            return components.Find(x => x is T) as T;
         }
 
         /// <summary>
@@ -73,20 +66,11 @@ namespace Entity
         /// </summary>
         /// <typeparam name="T">T必須是一種實體元件型別</typeparam>
         /// <returns></returns>
-        public EntityComponent[] GetComponents<T>() where T : EntityComponent
+        public T[] GetComponents<T>() where T : EntityComponent
         {
-            return components.FindAll(x => x is T).ToArray();
+            return components.FindAll(x => x is T).ToArray() as T[];
         }
 
-        /// <summary>
-        /// 回傳一個符合標籤的實體元件
-        /// </summary>
-        /// <param name="tag">自訂標籤</param>
-        /// <returns></returns>
-        public EntityComponent GetComponent(string tag)
-        {
-            return components.Find(x => x.tag == tag);
-        }
     }
 
 }
