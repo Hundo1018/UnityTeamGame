@@ -27,6 +27,7 @@ public class GameManager : MonoBehaviour
     GameEventArgs GameEventArgs;
     private void Awake()
     {
+        //時間Scale 預設為1 (沒有調整過)
         GameEventArgs = new GameEventArgs(1f);
         //TODO：跟UI訂閱開始、暫停、繼續的事件
     }

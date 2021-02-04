@@ -1,7 +1,13 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+class test:Component
+{
+    void a()
+    {
+        
+    }
+}
 public class EntityManager : MonoBehaviour
 {
     #region 單例模式
@@ -26,7 +32,7 @@ public class EntityManager : MonoBehaviour
 
     private  void OnGameUpdate(object sender, Timer.TimerEventArgs e)
     {
-
+       
     }
     // Start is called before the first frame update
     void Start()

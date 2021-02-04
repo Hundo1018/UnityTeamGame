@@ -10,6 +10,7 @@ namespace Entity
     /// <summary>
     /// 實體元件
     /// </summary>
+    
     public abstract class EntityComponent
     {
         protected string tag;
@@ -33,7 +34,11 @@ namespace Entity
                 components.Add(item);
             }
         }
-
+        public void Add<T>() where T : EntityComponent, new()
+        {
+            T temp = new T();
+            components.Add(temp);
+        }
         /// <summary>
         /// 刪除一個符合型別的實體元件
         /// </summary>
@@ -72,7 +77,7 @@ namespace Entity
         {
             return components.FindAll(x => x is T).ToArray();
         }
-        
+
         /// <summary>
         /// 回傳一個符合標籤的實體元件
         /// </summary>
@@ -83,4 +88,5 @@ namespace Entity
             return components.Find(x => x.tag == tag);
         }
     }
+
 }
