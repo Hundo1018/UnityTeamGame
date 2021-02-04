@@ -12,16 +12,9 @@ namespace Entity
     /// </summary>
     public abstract class EntityComponent
     {
-        protected string tag;
         protected List<EntityComponent> components;
 
-        protected EntityComponent(string tag)
-        {
-            this.tag = tag;
-            components = new List<EntityComponent>();
-        }
-
-        protected EntityComponent()
+        public EntityComponent()
         {
             components = new List<EntityComponent>();
         }
@@ -32,6 +25,11 @@ namespace Entity
             {
                 components.Add(item);
             }
+        }
+        public void Add<T>() where T : EntityComponent,new()
+        {
+            T temp = new T();
+            components.Add(temp);
         }
 
         /// <summary>
@@ -71,16 +69,6 @@ namespace Entity
         public EntityComponent[] GetComponents<T>() where T : EntityComponent
         {
             return components.FindAll(x => x is T).ToArray();
-        }
-        
-        /// <summary>
-        /// 回傳一個符合標籤的實體元件
-        /// </summary>
-        /// <param name="tag">自訂標籤</param>
-        /// <returns></returns>
-        public EntityComponent GetComponent(string tag)
-        {
-            return components.Find(x => x.tag == tag);
         }
     }
 }
