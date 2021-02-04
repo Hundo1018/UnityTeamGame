@@ -1,13 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-class test:Component
-{
-    void a()
-    {
-        
-    }
-}
+
 public class EntityManager : MonoBehaviour
 {
     #region 單例模式
