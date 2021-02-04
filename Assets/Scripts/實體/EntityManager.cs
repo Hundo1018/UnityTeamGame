@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-using Entity;
 public class EntityManager : MonoBehaviour
 {
     #region 單例模式
@@ -27,14 +26,12 @@ public class EntityManager : MonoBehaviour
 
     private  void OnGameUpdate(object sender, Timer.TimerEventArgs e)
     {
-
+       
     }
     // Start is called before the first frame update
     void Start()
     {
-        FlyingFish flyingFish = new FlyingFish("飛魚一", 10);
-        flyingFish.Add(new flyAbility());
-        flyingFish.GetComponent<flyAbility>().fly();
+        
     }
 
     // Update is called once per frame
