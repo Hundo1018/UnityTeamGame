@@ -213,6 +213,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1160417203}
+  - component: {fileID: 1160417204}
   m_Layer: 0
   m_Name: FloorManager
   m_TagString: Untagged
@@ -234,3 +235,20 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1160417204
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1160417202}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0626b9c13852374448b4bc4d10b26dbd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  scale: 1.5
+  xOffset: 1
+  yOffset: -4.5
+  floorPrefab: {fileID: 5988834039647752195, guid: 1c5b77e0b843e4b498d0ce415b2a46ed,
+    type: 3}
