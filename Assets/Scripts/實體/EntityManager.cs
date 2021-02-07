@@ -19,6 +19,7 @@ public class EntityManager : MonoBehaviour
         return _instance;
     }
     #endregion
+    
     private void Awake()//向Timer訂閱更新事件
     {
         Timer.TimerBehaviour.GameTimeUpdated += OnGameUpdate;
@@ -26,7 +27,7 @@ public class EntityManager : MonoBehaviour
 
     private  void OnGameUpdate(object sender, Timer.TimerEventArgs e)
     {
-       
+        Debug.Log(e._fixedUpdateNum);   
     }
     // Start is called before the first frame update
     void Start()

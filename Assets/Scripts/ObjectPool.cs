@@ -7,7 +7,7 @@ public class ObjectPool
     private static ObjectPool _instance;
     private ObjectPool()
     {
-        _pool = new Dictionary<string, List<GameObject>>();
+        _pool = new Dictionary<string, Queue<GameObject>>();
         _prefabs = new Dictionary<string, GameObject>();
     }
     public static ObjectPool GetInstance()

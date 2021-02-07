@@ -1,8 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-namespace GameManager
-{
+
 
     public class GameManager : MonoBehaviour
     {
@@ -61,5 +60,3 @@ namespace GameManager
             GameStatusChanged?.Invoke(this, GameEventArgs);
         }
     }
-
-}
