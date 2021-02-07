@@ -1,10 +1,10 @@
-﻿using System.Collections;
+﻿using UnityEngine;
+using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
-
-public class EntityUnit : Entity.EntityComponent
+public class EntityUnit : MonoBehaviour
 {
-
+    [SerializeField]
+    private List<Entity.EntityComponent> components;
 
 }
 

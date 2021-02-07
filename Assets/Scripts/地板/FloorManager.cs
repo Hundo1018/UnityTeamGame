@@ -1,7 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace Floor
 {
@@ -31,9 +28,9 @@ namespace Floor
         [SerializeField]
         private float scale = 1.5f;
         [SerializeField]
-        private float xOffset = 1;
+        private float xOffset = -8;
         [SerializeField]
-        private float yOffset = -4.5f;
+        private float yOffset = -4f;
 
         [SerializeField]
         private GameObject floorPrefab;
@@ -54,6 +51,7 @@ namespace Floor
         // Update is called once per frame
         void Update()
         {
+            adjust();
         }
         /// <summary>
         /// 從Prefab建立新物件
@@ -82,7 +80,19 @@ namespace Floor
             return floors;
         }
 
+        void adjust()
+        {
+            for (int y = 0; y < 5; y++)
+            {
+                for (int x = 0; x < 5; x++)
+                {
+                    float vX = xOffset + x * scale;
+                    float vY = yOffset + (5 - y) * scale;
+                    floorGameObjects[y, x].transform.localPosition = new Vector2(vX, vY);
 
+                }
+            }
+        }
 
         /// <summary>
         /// 設定Stage的狀態

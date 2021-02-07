@@ -1,5 +1,4 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 namespace Timer
 {
@@ -24,16 +23,22 @@ namespace Timer
 
 
         public static event System.EventHandler<TimerEventArgs> GameTimeUpdated;
-        
+
+        TimerEventArgs timerEventArgs;
         //TODO:這些要計數
         private int countBetweenUpdate;
         private int countBetweenFixedUpdate;
         private float timeBetweenScaledTime;
+
         private void Awake()
         {
             //向GameManager訂閱事件
             GameManager.GamePaused += OnGamePause;
             GameManager.GameStarted += OnGameStart;
+            countBetweenUpdate = 0;
+            countBetweenFixedUpdate = 0;
+            timeBetweenScaledTime = 0;
+            timerEventArgs = new TimerEventArgs();
         }
 
         // Start is called before the first frame update
@@ -55,14 +60,15 @@ namespace Timer
         void OnGamePause(object sender, GameEventArgs e)
         {
             Timer.TimerEventArgs a = new TimerEventArgs();
+
             //TODO：狀態改變會影響時間
-            StopCoroutine(GameTimeUpdate(e.timeScale));
+            StopCoroutine(GameTimeUpdate(e.updateGap));
         }
 
         void OnGameStart(object sender, GameEventArgs e)
         {
             //TODO：狀態改變會影響時間
-            StartCoroutine(GameTimeUpdate(e.timeScale));
+            StartCoroutine(GameTimeUpdate(e.updateGap));
         }
 
         /// <summary>
@@ -76,7 +82,7 @@ namespace Timer
             while (true)
             {
                 StartCoroutine(Wait(sec));
-                GameTimeUpdated?.Invoke(this, new TimerEventArgs());
+                GameTimeUpdated?.Invoke(this, timerEventArgs);
                 yield return null;
             }
         }

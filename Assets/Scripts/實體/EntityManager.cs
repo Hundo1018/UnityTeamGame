@@ -1,8 +1,6 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
-public class EntityManager : MonoBehaviour
+public class EntityManager :MonoBehaviour
 {
     #region 單例模式
     private static EntityManager _instance;
