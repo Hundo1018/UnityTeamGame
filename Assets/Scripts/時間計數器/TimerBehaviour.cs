@@ -33,8 +33,8 @@ namespace Timer
         private void Awake()
         {
             //向GameManager訂閱事件
-            GameManager.GamePaused += OnGamePause;
-            GameManager.GameStarted += OnGameStart;
+            GameManager.TimePaused += OnGamePause;
+            GameManager.TimeStarted += OnGameStart;
             countBetweenUpdate = 0;
             countBetweenFixedUpdate = 0;
             timeBetweenScaledTime = 0;
@@ -57,7 +57,7 @@ namespace Timer
             //TODO：計數    
         }
 
-        void OnGamePause(object sender, GameEventArgs e)
+        void OnGamePause(object sender, TimerEventArgs e)
         {
             Timer.TimerEventArgs a = new TimerEventArgs();
 
@@ -65,7 +65,7 @@ namespace Timer
             StopCoroutine(GameTimeUpdate(e.updateGap));
         }
 
-        void OnGameStart(object sender, GameEventArgs e)
+        void OnGameStart(object sender, TimerEventArgs e)
         {
             //TODO：狀態改變會影響時間
             StartCoroutine(GameTimeUpdate(e.updateGap));

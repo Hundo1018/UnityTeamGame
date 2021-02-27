@@ -19,6 +19,9 @@ namespace Timer
         /// </summary>
         public float _scaledTimeNum;
 
+        public float timeScale;
+        public float updateGap;
+
         /// <summary>
         /// 在實際時間間隔中，各種Update跑的次數或秒數，-1為未記錄
         /// </summary>
@@ -30,6 +33,11 @@ namespace Timer
             _updateNum = updateNum;
             _fixedUpdateNum = fixedUpdateNum;
             _scaledTimeNum = scaledTimeNum;
+        }
+        public TimerEventArgs(float updateGap, float timeScale = 1)
+        {
+            this.updateGap = updateGap;
+            this.timeScale = timeScale;
         }
     }
 }
