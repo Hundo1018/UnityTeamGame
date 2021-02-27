@@ -47,7 +47,6 @@ public class StageManager : MonoBehaviour
     /// </summary>
     /// <param name="v"></param>
     /// <param name="s"></param>
-
     public void SetStatus(Vector2Int v, bool s)
     {
         stageStatus[v.y * 5 + v.x] = s;

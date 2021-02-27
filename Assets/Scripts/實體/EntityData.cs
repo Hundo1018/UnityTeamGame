@@ -1,0 +1,7 @@
+﻿
+namespace Entity
+{
+    class EntityData
+    {
+    }
+}
