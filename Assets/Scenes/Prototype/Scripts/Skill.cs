@@ -173,16 +173,19 @@ namespace SkillConstructer
             Init(0, 0, 0, -1, 0);
         }
 
-        //建構玩家技能 或 固定式敵人攻擊
-        //shape是以每一Row以;分隔
-        //isPlayer True為玩家技能 False為固定式技能
+
+        /// <summary>
+        ///建構玩家技能 或 固定式敵人攻擊
+        ///shape是以每一Row以;分隔
+        ///isPlayer True為玩家技能 False為固定式技能
+        /// </summary>
+        /// <param name="shape">描述</param>
         public Skill(string shape, bool isPlayer)
         {
             if (isPlayer)
                 Init(shape, 0, 0);
             else Init(shape, 1, 0);
         }
-
         //建構隨機式敵人攻擊
         //range是以每一Row以;分隔
         //type 0是小於等於numberOfCube 1是等於numberOfCube
@@ -285,9 +288,9 @@ namespace SkillConstructer
         //敵人用攻擊
         public void Attack()
         {
+            DoBeforeAttack();
             int attackRange = getAttackRangeWithChange();
             int i = 24;
-            DoBeforeAttack();
             while (attackRange != 0)
             {
                 //攻擊範圍內再動作

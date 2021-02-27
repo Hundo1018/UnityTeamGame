@@ -1,36 +1,17 @@
 ﻿using UnityEngine;
-
-public class EntityManager :MonoBehaviour
+using Entity;
+public class EntityManager : MonoBehaviour
 {
-    #region 單例模式
-    private static EntityManager _instance;
-    private EntityManager()
-    {
-        //TODO：初始化
-    }
-    public static EntityManager GetInstance()
-    {
-        if (_instance == null)
-        {
-            _instance = new EntityManager();
-        }
-        return _instance;
-    }
-    #endregion
-    
-    private void Awake()//向Timer訂閱更新事件
-    {
-        Timer.TimerBehaviour.GameTimeUpdated += OnGameUpdate;
-    }
-
-    private  void OnGameUpdate(object sender, Timer.TimerEventArgs e)
-    {
-        Debug.Log(e._fixedUpdateNum);   
-    }
+    public string monsterName; 
+    EntityBase eb;
     // Start is called before the first frame update
     void Start()
     {
-        
+        if(monsterName == "skeleton"){
+            eb = new Skeleton("Skeleton",10);
+        }
+        eb.GetComponent<flyAbility>().fly();
+        eb.GetComponent<attackforward>().attack();
     }
 
     // Update is called once per frame

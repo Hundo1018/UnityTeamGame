@@ -1,4 +1,5 @@
 using UnityEngine;
+using SkillConstructer;
 namespace Entity
 {
     //  組合模式

@@ -11,7 +11,7 @@ namespace Entity
         Skill Ability = new Skill("101;010;101", true);
         Skill UltimateAbility = new Skill("00100;01110;11111;01110;00100", true);
 
-        public StageManager stageManager;
+        public FloorManager floorManager;
         Vector2Int now = new Vector2Int(2, 2);
         /// <summary>
         /// 垂直輸入(上下,WS)
@@ -44,7 +44,7 @@ namespace Entity
         void updateStatus()
         {
             //移動角色
-            this.transform.position = stageManager.stagesV[now.y, now.x];
+            this.transform.position = floorManager.floorsV[now.y, now.x];
             //設定
         }
         /// <summary>
@@ -54,11 +54,11 @@ namespace Entity
         {
             if (Input.GetKey(KeyCode.Space))//技能判斷
             {
-                if (UltimateAbility.Attack(now, stageManager.GetAllStatus()))
+                if (UltimateAbility.Attack(now, floorManager.GetAllStatus()))
                 {
                     Debug.Log("Ultimate!");
                 }
-                else if (Ability.Attack(now, stageManager.GetAllStatus()))
+                else if (Ability.Attack(now, floorManager.GetAllStatus()))
                 {
                     Debug.Log("Ability!");
                 }
@@ -69,31 +69,31 @@ namespace Entity
             }
             else if (Input.GetKeyDown(KeyCode.J))
             {//格子觸發判斷
-                stageManager.SetStatus(now, true);
+                floorManager.SetStatus(now, true);
             }
             else if (Input.GetKeyDown(KeyCode.K))
             {//格子觸發判斷
-                stageManager.SetStatus(now, true);
+                floorManager.SetStatus(now, true);
             }
             /*#region ForTestSkill
             else if (Input.GetKeyDown(KeyCode.U))
             {
-                stageManager.ClearAllStatus((int)Math.Pow(2, 26) - 1);
+                floorManager.ClearAllStatus((int)Math.Pow(2, 26) - 1);
                 fixedSkill_u.Attack();
             }
             else if (Input.GetKeyDown(KeyCode.I))
             {
-                stageManager.ClearAllStatus((int)Math.Pow(2, 26) - 1);
+                floorManager.ClearAllStatus((int)Math.Pow(2, 26) - 1);
                 randomSkill_i.Attack();
             }
             else if (Input.GetKeyDown(KeyCode.O))
             {
-                stageManager.ClearAllStatus((int)Math.Pow(2, 26) - 1);
+                floorManager.ClearAllStatus((int)Math.Pow(2, 26) - 1);
                 randomSkill_o.Attack();
             }
             else if (Input.GetKeyDown(KeyCode.P))
             {
-                stageManager.ClearAllStatus((int)Math.Pow(2, 26) - 1);
+                floorManager.ClearAllStatus((int)Math.Pow(2, 26) - 1);
                 trackingSkill_p.Attack();
             }
             #endregion//*/
@@ -131,11 +131,11 @@ namespace Entity
             /*updateStatus();
             Ability.DoAttackForEachCube = (x, y) =>
             {
-                stageManager.SetStatus(x, y, false);
+                floorManager.SetStatus(x, y, false);
             };
             UltimateAbility.DoAttackForEachCube = (x, y) =>
             {
-                stageManager.SetStatus(x, y, false);
+                floorManager.SetStatus(x, y, false);
             };
             /*#region ForTestSkill
             fixedSkill_u = new Skill("00011;01110;01110;01110;11", false);
@@ -144,19 +144,19 @@ namespace Entity
             trackingSkill_p = new Skill("01010;;01010;;01010", new Vector2Int((int)(rand * 5), (int)(rand * 5)));
             fixedSkill_u.DoAttackForEachCube = (x, y) =>
             {
-                stageManager.SetStatus(x, y, true);
+                floorManager.SetStatus(x, y, true);
             };
             randomSkill_i.DoAttackForEachCube = (x, y) =>
             {
-                stageManager.SetStatus(x, y, true);
+                floorManager.SetStatus(x, y, true);
             };
             randomSkill_o.DoAttackForEachCube = (x, y) =>
             {
-                stageManager.SetStatus(x, y, true);
+                floorManager.SetStatus(x, y, true);
             };
             trackingSkill_p.DoAttackForEachCube = (x, y) =>
             {
-                stageManager.SetStatus(x, y, true);
+                floorManager.SetStatus(x, y, true);
             };
             trackingSkill_p.DoAfterAttack = () =>
             {
