@@ -22,10 +22,10 @@ public class GameManager : MonoBehaviour
     #endregion
 
 
-    public static event System.EventHandler<TimerEventArgs> timeStatusChanged;
-    public static event System.EventHandler<TimerEventArgs> timePaused;
-    public static event System.EventHandler<TimerEventArgs> timeContinued;
-    public static event System.EventHandler<TimerEventArgs> timeStarted;
+    public static event System.EventHandler<TimerEventArgs> TimeStatusChanged;
+    public static event System.EventHandler<TimerEventArgs> TimePaused;
+    public static event System.EventHandler<TimerEventArgs> TimeContinued;
+    public static event System.EventHandler<TimerEventArgs> TimeStarted;
 
     TimerEventArgs timeEventArgs;
 
@@ -38,11 +38,12 @@ public class GameManager : MonoBehaviour
         //TODO：跟UI訂閱開始、暫停、繼續的事件
 
 
+        UIController.SceneChanged += ChangeSceneEventHandler;
     }
     // Start is called before the first frame update
     void Start()
     {
-        timeStarted?.Invoke(this, timeEventArgs);
+        TimeStarted?.Invoke(this, timeEventArgs);
     }
 
     // Update is called once per frame
@@ -57,25 +58,24 @@ public class GameManager : MonoBehaviour
     float gameTimeScale;
     void GameStart()
     {
-        timeStarted?.Invoke(this, timeEventArgs);
-        timeStatusChanged?.Invoke(this, timeEventArgs);
+        TimeStarted?.Invoke(this, timeEventArgs);
+        TimeStatusChanged?.Invoke(this, timeEventArgs);
     }
     void GamePause()
     {
-        timePaused?.Invoke(this, timeEventArgs);
-        timeStatusChanged?.Invoke(this, timeEventArgs);
+        TimePaused?.Invoke(this, timeEventArgs);
+        TimeStatusChanged?.Invoke(this, timeEventArgs);
     }
     void GameContinue()
     {
-        timeContinued?.Invoke(this, timeEventArgs);
-        timeStatusChanged?.Invoke(this, timeEventArgs);
+        TimeContinued?.Invoke(this, timeEventArgs);
+        TimeStatusChanged?.Invoke(this, timeEventArgs);
     }
     #endregion
 
     #region 場景
-    private void ChangeScene(object sender, UIEventArgs e)
+    private void ChangeSceneEventHandler(object sender, UIEventArgs e)
     {
-        UIController.SceneChanged += ChangeScene;
         SceneManager.LoadScene("");
     }
     #endregion
