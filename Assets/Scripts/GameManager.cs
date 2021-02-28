@@ -17,7 +17,7 @@ public class GameManager : MonoBehaviour
         if (_instance == null)
         {
             _instance = new GameManager();
-            //DontDestroyOnLoad();
+            DontDestroyOnLoad(GetInstance());
         }
         return _instance;
     }
@@ -48,7 +48,7 @@ public class GameManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        TimeStarted?.Invoke(this, timeEventArgs);
+        TimeStarted?.Invoke(GetInstance(), timeEventArgs);
     }
 
     // Update is called once per frame
@@ -63,18 +63,18 @@ public class GameManager : MonoBehaviour
     float battleTimeScale;
     void BattleStartEventHandler(object sender, UIEventArgs e)
     {
-        TimeStarted?.Invoke(this, timeEventArgs);
-        TimeStatusChanged?.Invoke(this, timeEventArgs);
+        TimeStarted?.Invoke(GetInstance(), timeEventArgs);
+        TimeStatusChanged?.Invoke(GetInstance(), timeEventArgs);
     }
     void BattlePauseEventHandler(object sender, UIEventArgs e)
     {
-        TimePaused?.Invoke(this, timeEventArgs);
-        TimeStatusChanged?.Invoke(this, timeEventArgs);
+        TimePaused?.Invoke(GetInstance(), timeEventArgs);
+        TimeStatusChanged?.Invoke(GetInstance(), timeEventArgs);
     }
     void BattleContinueEventHandler(object sender, UIEventArgs e)
     {
-        TimeContinued?.Invoke(this, timeEventArgs);
-        TimeStatusChanged?.Invoke(this, timeEventArgs);
+        TimeContinued?.Invoke(GetInstance(), timeEventArgs);
+        TimeStatusChanged?.Invoke(GetInstance(), timeEventArgs);
     }
     #endregion
 
@@ -82,31 +82,32 @@ public class GameManager : MonoBehaviour
 
     private void ChangeSceneEventHandler(object sender, UIEventArgs e)
     {
-        string ns = "";
+        string sceneName = "";
+        //LoadSceneMode lsm;
         switch (e.nextScene)
         {
             case UI.Scene.mainMenu:
-                ns = "MainScene";
+                sceneName = "MainScene";
                 break;
             case UI.Scene.selectLevel:
-                ns = "SelectLevelScene";
+                sceneName = "SelectLevelScene";
                 break;
             case UI.Scene.selectCharacter:
-                ns = "SelectCharacterScene";
+                sceneName = "SelectCharacterScene";
                 break;
             case UI.Scene.store:
-                ns = "StoreScene";
+                sceneName = "StoreScene";
                 break;
             case UI.Scene.battle:
-                ns = "BattleScene";
+                sceneName = "BattleScene";
                 break;
             case UI.Scene.story:
-                ns = "StoryScene";
+                sceneName = "StoryScene";
                 break;
             default:
                 break;
         }
-        Debug.Log("now Loading" + ns);
+        SceneManager.LoadScene(sceneName, LoadSceneMode.Single);//暫時都使用single模式
     }
     #endregion
 }
