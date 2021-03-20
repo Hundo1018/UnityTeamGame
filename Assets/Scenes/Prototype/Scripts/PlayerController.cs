@@ -33,7 +33,7 @@ namespace Entity
             }
         }
         #endregion//*/
-        
+
         public Vector2Int getPosition()
         {
             return now;
@@ -52,7 +52,7 @@ namespace Entity
         /// </summary>
         void action()
         {
-            if (Input.GetKey(KeyCode.Space))//技能判斷
+            if (Input.GetKeyDown(KeyCode.Space))//技能判斷
             {
                 if (UltimateAbility.Attack(now, stageManager.GetAllStatus()))
                 {

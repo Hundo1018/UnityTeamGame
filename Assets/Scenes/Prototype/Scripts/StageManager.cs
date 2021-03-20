@@ -13,6 +13,7 @@ public class StageManager : MonoBehaviour
         generate();
         InitEntity();
         InitPalyer();
+        InitSkillSet();
     }
 
     // Update is called once per frame
@@ -21,6 +22,7 @@ public class StageManager : MonoBehaviour
         PlayerAction();
         EntityAction();
         SummonEntity();
+        RunSkillSet();
     }
 
     #region Stage
@@ -47,7 +49,6 @@ public class StageManager : MonoBehaviour
     /// </summary>
     /// <param name="v"></param>
     /// <param name="s"></param>
-
     public void SetStatus(Vector2Int v, bool s)
     {
         stageStatus[v.y * 5 + v.x] = s;
@@ -118,7 +119,7 @@ public class StageManager : MonoBehaviour
     public GameObject player;
     Skill Ability = new Skill("101;010;101", true);
     Skill UltimateAbility = new Skill("00100;01110;11111;01110;00100", true);
-    
+
     Vector2Int now = new Vector2Int(2, 2);
     /// <summary>
     /// 垂直輸入(上下,WS)
@@ -129,7 +130,7 @@ public class StageManager : MonoBehaviour
 
     void PlayerAction()
     {
-        if (Input.GetKey(KeyCode.Space))//技能判斷
+        if (Input.GetKeyDown(KeyCode.Space))//技能判斷
         {
             if (UltimateAbility.Attack(now, GetAllStatus()))
             {
@@ -166,7 +167,7 @@ public class StageManager : MonoBehaviour
             player.transform.position = stagesV[now.y, now.x];
         }
     }
-    
+
     void InitPalyer()
     {
         player.transform.position = stagesV[2, 2];
@@ -179,7 +180,7 @@ public class StageManager : MonoBehaviour
             SetStatus(x, y, false);
         };
     }
-    
+
     void PlayerDo()
     {
         if (Input.anyKeyDown)
@@ -201,6 +202,7 @@ public class StageManager : MonoBehaviour
 
     private List<Entities> entities = new List<Entities>();
     Skill fixedSkill_u, randomSkill_i, randomSkill_o, trackingSkill_p;
+    int oNum = 0;
 
     //隨機生成亂數用
     private double rand
@@ -217,6 +219,7 @@ public class StageManager : MonoBehaviour
         randomSkill_i = new Skill("10101;01010;10101;01010;10101", 0, 5);
         randomSkill_o = new Skill("011;0011;11111;011;0011", 1, 3);
         trackingSkill_p = new Skill("01010;;01010;;01010", new Vector2Int(2, 2));
+
         fixedSkill_u.DoAttackForEachCube = (x, y) => {
             Entities temp = new Entities(thorn, 1 + x * 1.5, -4.5 + (5 - y) * 1.5, 1);
             temp._action = (self) =>
@@ -270,15 +273,36 @@ public class StageManager : MonoBehaviour
             temp._object.transform.parent = parentManager.transform;
             entities.Add(temp);
         };
-        trackingSkill_p.DoAfterAttack = () =>
+        trackingSkill_p.DoBeforeAttack = () =>
         {
             trackingSkill_p.ChangeData(now);
         };
+
+        fixedSkill_u.DoAfterAttack = () =>
+        {
+            Debug.Log($"Add {entities.Count - oNum} entities");
+            oNum = entities.Count;
+        };
+        randomSkill_i.DoAfterAttack = () =>
+        {
+            Debug.Log($"Add {entities.Count - oNum} entities");
+            oNum = entities.Count;
+        };
+        randomSkill_o.DoAfterAttack = () =>
+        {
+            Debug.Log($"Add {entities.Count - oNum} entities");
+            oNum = entities.Count;
+        };
+        trackingSkill_p.DoAfterAttack = () =>
+        {
+            Debug.Log($"Add {entities.Count - oNum} entities");
+            oNum = entities.Count;
+        };
     }
-    
+
     void SummonEntity()
     {
-        if(Input.GetKeyDown(KeyCode.U))
+        if (Input.GetKeyDown(KeyCode.U))
         {
             Debug.Log("Press U");
             fixedSkill_u.Attack();
@@ -306,16 +330,33 @@ public class StageManager : MonoBehaviour
         for (int i = 0; i < len; i++)
         {
             entities[i].Attack(now.x, now.y);
-            if (len>entities.Count)
+            if (len > entities.Count)
             {
                 len--;
                 i--;
             }
         }
+        oNum = entities.Count;
     }
     //*/
     #endregion
 
+    #region SkillSet
+
+    private List<Skill> skillSet = new List<Skill>();
+    private int index, counter;
+
+    void InitSkillSet()
+    {
+        Skill skillA = new Skill();
+    }
+
+    void RunSkillSet()
+    {
+
+    }
+    //*/
+    #endregion
 }
 
 
@@ -327,7 +368,7 @@ public class Entities
     public GameObject _object;
 
     private void Init(GameObject gameObject, double x, double y, double hp, Action<Entities> action, params Skill[] skills)
-    {   
+    {
         _object = GameObject.Instantiate(gameObject);
         _object.transform.localPosition = new Vector2(1, -4.5f);
         _object.transform.position = new Vector3((float)x, (float)y, -1);
@@ -340,7 +381,7 @@ public class Entities
             _skills[i] = new Skill(skills[i]);
         }
     }
-    
+
     public Entities(GameObject gameObject, double x, double y, double hp)
     {
         Init(gameObject, x, y, hp, (self) => { }, new Skill[0]);
@@ -387,5 +428,9 @@ public class Entities
         _HP -= d;
         return _HP <= 0;
     }
-    
+
 }//*/
+
+public class Act
+{
+}

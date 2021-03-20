@@ -74,9 +74,9 @@ namespace SkillConstructer
             //攻擊範圍(隨機式)
             else if (_type == 2)
             {
-                int max = _data / 2, cou = 0, i = 0;
-                if (_data % 2 == 0)
+                /*if (_data % 2 == 0)
                 {
+                    int max = _data / 2, cou = 0, i = 0;
                     _nextRange = 0;
                     //隨機生成
                     while (i < 25)
@@ -95,8 +95,9 @@ namespace SkillConstructer
                     //過濾範圍外位置
                     _nextRange &= _shape;
                 }
-                else
+                else if (_data % 2 == 1)
                 {
+                    int max = _data / 2, cou = 0, i = 0;
                     int tempRange = 1;
                     _nextRange = _shape;
                     //計算場上可釋放的格子數量
@@ -142,13 +143,65 @@ namespace SkillConstructer
                         tempRange >>= 1;
                     }
                 }
+                else
+                {//*/
+                int min = _data % 32, max = _data >> 5, i, cou = 0;
+                int tempRange = 1;
+                _nextRange = _shape;
+                //計算場上可釋放的格子數量
+                i = 0;
+                while (i < 25)
+                {
+                    tempRange <<= 1;
+                    if (_nextRange % 2 == 1)
+                    {
+                        tempRange += 1;
+                        cou++;
+                    }
+                    _nextRange >>= 1;
+                    i++;
+                }
+                //判斷上限是否超過格子數
+                if (max > cou) max = cou;
+                //判斷下限是否超過上限
+                if (min > max) min = max;
+                //隨機生成
+                i = 0;
+                while (i < max)
+                {
+                    _nextRange <<= 1;
+                    if (tempRange % 2 == 1)
+                    {
+                        //判斷是否剩餘格子數不夠
+                        if (cou == min - i)
+                        {
+                            _nextRange += 1;
+                            i++;
+                        }
+                        else if (rand * 25 < max)
+                        {
+                            _nextRange += 1;
+                            i++;
+                        }
+                        cou--;
+                    }
+                    tempRange >>= 1;
+                    if (tempRange == 1) break;
+                }
+                //填滿25格
+                while (tempRange > 1)
+                {
+                    _nextRange <<= 1;
+                    tempRange >>= 1;
+                }
+                //}
             }
             //攻擊範圍(追蹤式)
             else if (_type == 3)
             {
                 int[] temp = new int[25];
                 _nextRange = _shape;
-                int dy = (_data / 5)+3, dx = (_data % 5)+3;
+                int dy = (_data / 5) + 3, dx = (_data % 5) + 3;
                 for (int i = 4; i >= 0; i--)
                 {
                     for (int j = 4; j >= 0; j--)
@@ -187,9 +240,9 @@ namespace SkillConstructer
         //range是以每一Row以;分隔
         //type 0是小於等於numberOfCube 1是等於numberOfCube
         //numberOfCube是召喚的上限
-        public Skill(string range, int type, int numberOfCube)
+        public Skill(string range, int lowerLimit, int upperLimit)
         {
-            Init(range, 2, (numberOfCube << 1) + type);
+            Init(range, 2, (upperLimit << 5) + lowerLimit);
         }
 
         //建構追蹤式敵人攻擊
@@ -285,9 +338,9 @@ namespace SkillConstructer
         //敵人用攻擊
         public void Attack()
         {
+            DoBeforeAttack();
             int attackRange = getAttackRangeWithChange();
             int i = 24;
-            DoBeforeAttack();
             while (attackRange != 0)
             {
                 //攻擊範圍內再動作
@@ -322,7 +375,7 @@ namespace SkillConstructer
                     isOK[i * w + j] = ((status & _nextRange) == _nextRange);
                     _nextRange >>= 1;
                 }
-                _nextRange >>= _w-1;
+                _nextRange >>= _w - 1;
             }
             //尋找適當的位置
             while (pos < 0) pos += w;
@@ -351,106 +404,6 @@ namespace SkillConstructer
                     i -= 1;
                 }
                 DoAfterAttack();
-                return true;
-            }
-            return false;
-        }
-    }
-
-    public class Effect
-    {
-        
-        private int _type;  //攻擊類型
-        private int _times, _base;//倍率 基底
-        // NewValue = OldValue * _times + _base
-
-        private int _interval, _totalTime, _remaining;
-        //間格時間 持續時間 剩餘時間
-
-        public Func<bool> _condition;
-        //觸發條件
-
-        //初始化變數用
-        private void Init(int type, int times, int baseValue, int interval, int totalTime, Func<bool> condiiton)
-        {
-            _type = type;
-            _times = times;
-            _base = baseValue;
-            _interval = interval;
-            _totalTime = totalTime;
-            _remaining = -1;
-            _condition = condiiton;
-        }
-
-        //空效果
-        public Effect()
-        {
-            Init(0, 1, 0, 1, 0, () =>
-            {
-                return ((_totalTime - _remaining) % _interval) == 0;
-            });
-        }
-
-        //單次觸發型(ex:受傷)
-        //times是數值乘以地倍率
-        //baseValue是再加上的基底
-        private Effect(int times, int baseValue)
-        {
-            Init(1, times, baseValue, 1, 1, () =>
-            {
-                return ((_totalTime - _remaining) % _interval) == 0;
-            });
-        }
-
-        //持續發作型(ex:減速)
-        //times是數值乘以地倍率
-        //baseValue是再加上的基底
-        //totalTime是效果的持續時間
-        private Effect(int times, int baseValue, int totalTime)
-        {
-            Init(1, times, baseValue, 1, totalTime, () =>
-            {
-                return ((_totalTime - _remaining) % _interval) == 0;
-            });
-        }
-
-        //多次觸發型(ex:中毒)
-        //times是數值乘以地倍率
-        //baseValue是再加上的基底
-        //totalTime是效果的持續時間
-        //interval是效果觸發的間格時間
-        private Effect(int times, int baseValue, int totalTime, int interval)
-        {
-            Init(1, times, baseValue, interval, totalTime, () =>
-            {
-                return ((_totalTime - _remaining) % _interval) == 0;
-            });
-        }
-
-        //特殊觸發型(ex:反傷)
-        //times是數值乘以地倍率
-        //baseValue是再加上的基底
-        //totalTime是效果的持續時間
-        //conditoin是觸發的條件
-        private Effect(int times, int baseValue, int totalTime, Func<bool> condition)
-        {
-            Init(1, times, baseValue, 1, totalTime, condition);
-        }
-
-        //開始倒數
-        public void Reset()
-        {
-            _remaining = _totalTime;
-        }
-
-        //執行
-        public bool Do(ref int value)
-        {
-            if (_remaining>0)
-            {
-                if (_condition())
-                    value = value * _times + _base;
-                _remaining--;
                 return true;
             }
             return false;
