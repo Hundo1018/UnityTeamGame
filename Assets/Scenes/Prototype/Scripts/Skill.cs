@@ -74,77 +74,7 @@ namespace SkillConstructer
             //攻擊範圍(隨機式)
             else if (_type == 2)
             {
-                /*if (_data % 2 == 0)
-                {
-                    int max = _data / 2, cou = 0, i = 0;
-                    _nextRange = 0;
-                    //隨機生成
-                    while (i < 25)
-                    {
-                        _nextRange <<= 1;
-                        i++;
-                        if (rand * 25 < max)
-                        {
-                            _nextRange += 1;
-                            cou++;
-                        }
-                        //確認是否達到上限
-                        if (cou == max) break;
-                    }
-                    _nextRange <<= 25 - i;
-                    //過濾範圍外位置
-                    _nextRange &= _shape;
-                }
-                else if (_data % 2 == 1)
-                {
-                    int max = _data / 2, cou = 0, i = 0;
-                    int tempRange = 1;
-                    _nextRange = _shape;
-                    //計算場上可釋放的格子數量
-                    while (i < 25)
-                    {
-                        tempRange <<= 1;
-                        if (_nextRange % 2 == 1)
-                        {
-                            tempRange += 1;
-                            cou++;
-                        }
-                        _nextRange >>= 1;
-                        i++;
-                    }
-                    //判斷上限是否超過格子數
-                    if (max > cou) max = cou;
-                    //隨機生成
-                    i = 0;
-                    while (i < max)
-                    {
-                        _nextRange <<= 1;
-                        if (tempRange % 2 == 1)
-                        {
-                            //判斷是否剩餘格子數不夠
-                            if (cou == max - i)
-                            {
-                                _nextRange += 1;
-                                i++;
-                            }
-                            else if (rand * 25 < max)
-                            {
-                                _nextRange += 1;
-                                i++;
-                            }
-                            cou--;
-                        }
-                        tempRange >>= 1;
-                    }
-                    //填滿25格
-                    while (tempRange > 1)
-                    {
-                        _nextRange <<= 1;
-                        tempRange >>= 1;
-                    }
-                }
-                else
-                {//*/
+                
                 int min = _data % 32, max = _data >> 5, i, cou = 0;
                 int tempRange = 1;
                 _nextRange = _shape;
@@ -238,8 +168,8 @@ namespace SkillConstructer
 
         //建構隨機式敵人攻擊
         //range是以每一Row以;分隔
-        //type 0是小於等於numberOfCube 1是等於numberOfCube
-        //numberOfCube是召喚的上限
+        //lowerLimit是召喚數量的下限
+        //upperLimit是召喚數量的上限
         public Skill(string range, int lowerLimit, int upperLimit)
         {
             Init(range, 2, (upperLimit << 5) + lowerLimit);
@@ -252,31 +182,7 @@ namespace SkillConstructer
         {
             Init(range, 3, position.y * 5 + position.x);
         }
-
-        /*//建構固定式敵人攻擊
-        //range是以25bits來表示的攻擊範圍
-        public Skill(int range)
-        {
-            Init(0, 0, range, 1, 0);
-        }
-  
-        //建構隨機式敵人攻擊
-        //range是以25bits來表示的攻擊範圍
-        //type 0是小於等於numberOfCube 1是等於numberOfCube
-        //numberOfCube是召喚的上限
-        public Skill(int range, int type, int numberOfCube)
-        {
-            Init(0, 0, range, 2, (numberOfCube << 1) + type);
-        }
-  
-        //建構追蹤式敵人攻擊
-        //range是以25bits來表示的相對攻擊範圍
-        //position是玩家的位置
-        public Skill(int range, Vector2Int position)
-        {
-            Init(0, 0, range, 3, position.y * 5 + position.x);
-        }//*/
-
+        
         //複製Skill
         public Skill(Skill skill)
         {

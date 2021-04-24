@@ -349,6 +349,7 @@ public class StageManager : MonoBehaviour
     void InitSkillSet()
     {
         Skill skillA = new Skill();
+
     }
 
     void RunSkillSet()
