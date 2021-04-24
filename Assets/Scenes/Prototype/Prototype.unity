@@ -150,7 +150,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f90ce830cf74fc2489e0d73fc2eb75e5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  stagePrefab: {fileID: 5988834039647752195, guid: 1c5b77e0b843e4b498d0ce415b2a46ed,
+  floorPrefab: {fileID: 5988834039647752195, guid: 1c5b77e0b843e4b498d0ce415b2a46ed,
     type: 3}
   parentManager: {fileID: 11991668}
   scale: 1.5
@@ -466,6 +466,11 @@ PrefabInstance:
     - target: {fileID: 5686985909954793035, guid: 2dc8b759861313d46a84dac98b6dad17,
         type: 3}
       propertyPath: stageManager
+      value: 
+      objectReference: {fileID: 11991669}
+    - target: {fileID: 5686985909954793035, guid: 2dc8b759861313d46a84dac98b6dad17,
+        type: 3}
+      propertyPath: floorManager
       value: 
       objectReference: {fileID: 11991669}
     m_RemovedComponents: []

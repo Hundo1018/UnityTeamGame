@@ -15,28 +15,31 @@ public class GameManager : MonoBehaviour
     {
         //TODO：初始化
     }
-    public static GameManager GetInstance()
+    public static GameManager GetInstance
     {
-        if (_instance == null)
-        {
-            _instance = new GameManager();
-            DontDestroyOnLoad(GetInstance());
-        }
-        return _instance;
+        get { return _instance; }
     }
     #endregion
 
+    Stack<UI.Scene> stackScenes;
 
     public static event System.EventHandler<TimerEventArgs> TimeStatusChanged;
     public static event System.EventHandler<TimerEventArgs> TimePaused;
     public static event System.EventHandler<TimerEventArgs> TimeContinued;
     public static event System.EventHandler<TimerEventArgs> TimeStarted;
 
+    UI.Scene nowScene;
+
     TimerEventArgs timeEventArgs;
 
 
     private void Awake()
     {
+        if (_instance != null && _instance != this)
+            Destroy(this.gameObject);
+        else
+            _instance = this;
+        DontDestroyOnLoad(GetInstance);
         //時間Scale 預設為1 (沒有調整過)
         timeEventArgs = new TimerEventArgs(1f);
 
@@ -47,29 +50,39 @@ public class GameManager : MonoBehaviour
 
         //跟UI訂閱場景改變事件
         UIController.SceneChanged += ChangeSceneEventHandler;
+
+        stackScenes = new Stack<UI.Scene>();
+        
     }
     // Start is called before the first frame update
     void Start()
     {
-        TimeStarted?.Invoke(GetInstance(), timeEventArgs);
+        TimeStarted?.Invoke(GetInstance, timeEventArgs);
     }
 
     // Update is called once per frame
     void Update()
     {
-
+        if (Input.GetKeyDown(KeyCode.Escape) && stackScenes.Count > 0)//上一頁
+        {
+            //ChangeSceneEventHandler(this, new UIEventArgs().nextScene = stackScenes.Pop());
+            SceneManager.LoadScene(EnumToString(stackScenes.Pop()), LoadSceneMode.Single);//暫時都使用single模式
+            
+        }
     }
 
+
+    #region 讀寫玩家資料
     void ReadJSON()
     {
-       string data = File.ReadAllText("PlayerData.json");
+        string data = File.ReadAllText("PlayerData.json");
         Debug.Log(data);
         Player.PlayerData pda = JsonUtility.FromJson<Player.PlayerData>(data);
-    
+
     }
     void WriteJSON()
     {
-        Player.PlayerData pd =new Player.PlayerData();// = new Player.PlayerData();
+        Player.PlayerData pd = new Player.PlayerData();// = new Player.PlayerData();
         pd.a = Player.testEnum.testV2;
         //pd.tcd = new Player.testClassData(9487);
         pd.level = 0;
@@ -82,36 +95,32 @@ public class GameManager : MonoBehaviour
         string data = JsonUtility.ToJson(pd, true);
         File.WriteAllText("PlayerData.json", data);
     }
-
+    #endregion
 
     #region 時間:開始、暫停、繼續
     float battleTimeScale;
     void BattleStartEventHandler(object sender, UIEventArgs e)
     {
-        TimeStarted?.Invoke(GetInstance(), timeEventArgs);
-        TimeStatusChanged?.Invoke(GetInstance(), timeEventArgs);
+        TimeStarted?.Invoke(GetInstance, timeEventArgs);
+        TimeStatusChanged?.Invoke(GetInstance, timeEventArgs);
     }
     void BattlePauseEventHandler(object sender, UIEventArgs e)
     {
-        TimePaused?.Invoke(GetInstance(), timeEventArgs);
-        TimeStatusChanged?.Invoke(GetInstance(), timeEventArgs);
+        TimePaused?.Invoke(GetInstance, timeEventArgs);
+        TimeStatusChanged?.Invoke(GetInstance, timeEventArgs);
     }
     void BattleContinueEventHandler(object sender, UIEventArgs e)
     {
-        TimeContinued?.Invoke(GetInstance(), timeEventArgs);
-        TimeStatusChanged?.Invoke(GetInstance(), timeEventArgs);
+        TimeContinued?.Invoke(GetInstance, timeEventArgs);
+        TimeStatusChanged?.Invoke(GetInstance, timeEventArgs);
     }
     #endregion
 
     #region 場景
-
-    private void ChangeSceneEventHandler(object sender, UIEventArgs e)
+    string EnumToString(UI.Scene scene)
     {
-        WriteJSON();
-        ReadJSON();
         string sceneName = "";
-        //LoadSceneMode lsm;
-        switch (e.nextScene)
+        switch (scene)
         {
             case UI.Scene.mainMenu:
                 sceneName = "MainScene";
@@ -134,7 +143,15 @@ public class GameManager : MonoBehaviour
             default:
                 break;
         }
+        return sceneName;
+    }
+    private void ChangeSceneEventHandler(object sender, UIEventArgs e)
+    {
+        string sceneName = EnumToString(e.nextScene);
+        stackScenes.Push(GameManager.GetInstance.nowScene);
+        //SceneManager.UnloadSceneAsync(EnumToString(nowScene));
         SceneManager.LoadScene(sceneName, LoadSceneMode.Single);//暫時都使用single模式
     }
+
     #endregion
 }
