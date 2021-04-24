@@ -63,12 +63,7 @@ public class GameManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Escape) && stackScenes.Count > 0)//上一頁
-        {
-            //ChangeSceneEventHandler(this, new UIEventArgs().nextScene = stackScenes.Pop());
-            SceneManager.LoadScene(EnumToString(stackScenes.Pop()), LoadSceneMode.Single);//暫時都使用single模式
-            
-        }
+
     }
 
 
@@ -116,7 +111,7 @@ public class GameManager : MonoBehaviour
     }
     #endregion
 
-    #region 場景
+    #region 場景切換
     string EnumToString(UI.Scene scene)
     {
         string sceneName = "";
@@ -145,12 +140,19 @@ public class GameManager : MonoBehaviour
         }
         return sceneName;
     }
+    //返回上一頁
+    void PreviousScene()
+    {
+        if (stackScenes.Count > 0)
+        {
+            SceneManager.LoadScene(EnumToString(stackScenes.Pop()), LoadSceneMode.Single);
+        }
+    }
     private void ChangeSceneEventHandler(object sender, UIEventArgs e)
     {
         string sceneName = EnumToString(e.nextScene);
         stackScenes.Push(GameManager.GetInstance.nowScene);
-        //SceneManager.UnloadSceneAsync(EnumToString(nowScene));
-        SceneManager.LoadScene(sceneName, LoadSceneMode.Single);//暫時都使用single模式
+        SceneManager.LoadScene(sceneName, LoadSceneMode.Single);
     }
 
     #endregion
