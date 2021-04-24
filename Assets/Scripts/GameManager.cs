@@ -4,6 +4,9 @@ using System.Collections.Generic;
 using UI;
 using Timer;
 using UnityEngine.SceneManagement;
+using UnityEngine.Serialization;
+using System.IO;
+
 public class GameManager : MonoBehaviour
 {
     #region 單例模式
@@ -57,6 +60,28 @@ public class GameManager : MonoBehaviour
 
     }
 
+    void ReadJSON()
+    {
+       string data = File.ReadAllText("PlayerData.json");
+        Debug.Log(data);
+        Player.PlayerData pda = JsonUtility.FromJson<Player.PlayerData>(data);
+    
+    }
+    void WriteJSON()
+    {
+        Player.PlayerData pd =new Player.PlayerData();// = new Player.PlayerData();
+        pd.a = Player.testEnum.testV2;
+        //pd.tcd = new Player.testClassData(9487);
+        pd.level = 0;
+        pd.id = 87;
+        pd.money = 1;
+        pd.name = "{}{}";
+        pd.isBool = false;
+        pd.floatValue = 1f / 3f;
+        pd.tcd = new Player.testClassData(9487);
+        string data = JsonUtility.ToJson(pd, true);
+        File.WriteAllText("PlayerData.json", data);
+    }
 
 
     #region 時間:開始、暫停、繼續
@@ -82,6 +107,8 @@ public class GameManager : MonoBehaviour
 
     private void ChangeSceneEventHandler(object sender, UIEventArgs e)
     {
+        WriteJSON();
+        ReadJSON();
         string sceneName = "";
         //LoadSceneMode lsm;
         switch (e.nextScene)
