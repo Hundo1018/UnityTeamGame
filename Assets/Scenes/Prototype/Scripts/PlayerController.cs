@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using SkillConstructer;
-
+using Entity;
 namespace Entity
 {
     public class PlayerController : MonoBehaviour
@@ -74,6 +74,10 @@ namespace Entity
             else if (Input.GetKeyDown(KeyCode.K))
             {//格子觸發判斷
                 floorManager.SetStatus(now, true);
+            }
+            else if (Input.GetKeyDown(KeyCode.B))
+            {
+
             }
             /*#region ForTestSkill
             else if (Input.GetKeyDown(KeyCode.U))

@@ -133,7 +133,7 @@ GameObject:
   - component: {fileID: 110555231}
   - component: {fileID: 110555230}
   m_Layer: 0
-  m_Name: skeleton
+  m_Name: EntityManager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -151,7 +151,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c4179b86a55aa2d4da86a4c2f65ce4a0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  monsterName: skeleton
+  parentManager: {fileID: 110555229}
 --- !u!212 &110555231
 SpriteRenderer:
   m_ObjectHideFlags: 0

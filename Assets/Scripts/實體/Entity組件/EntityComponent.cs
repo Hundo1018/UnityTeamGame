@@ -11,6 +11,8 @@ namespace Entity
     {
         protected List<EntityComponent> components;
 
+        protected EntityComponent parent;
+
         protected EntityComponent()
         {
             components = new List<EntityComponent>();
@@ -21,12 +23,14 @@ namespace Entity
             foreach (var item in entity)
             {
                 components.Add(item);
+                item.parent = this;
             }
         }
         public void Add<T>() where T : EntityComponent, new()
         {
             T temp = new T();
             components.Add(temp);
+            temp.parent = this;
         }
         /// <summary>
         /// 刪除一個符合型別的實體元件

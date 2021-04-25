@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using SkillConstructer;
-
+using Entity;
 public class FloorManager : MonoBehaviour
 {
 
@@ -280,7 +280,7 @@ public class FloorManager : MonoBehaviour
         if(Input.GetKeyDown(KeyCode.U))
         {
             Debug.Log("Press U");
-            fixedSkill_u.Attack();
+            EntityManager.Instance.eb.GetComponent<SummonSkeleton>().Summon();
         }
         else if (Input.GetKeyDown(KeyCode.I))
         {
